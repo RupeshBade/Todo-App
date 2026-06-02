@@ -220,13 +220,75 @@
             max-height: 150px;
             overflow-y: auto;
         }
+
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .user-info {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .btn-logout {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+
+        .success-message {
+            background-color: #dcfce7;
+            color: #166534;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="todo-container">
+
+        <div class="user-bar">
+
+            <div class="user-info">
+                Welcome, {{ auth()->user()->name }}
+            </div>
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn-logout">
+                    Logout
+                </button>
+            </form>
+
+        </div>
+
         <h2>Tasks To-Do</h2>
+
+        @if(session('success'))
+        <div class="success-message">
+            {{ session('success') }}
+        </div>
+        @endif
 
         <form action="{{ route('tasks.store') }}" method="POST" class="input-group">
             @csrf

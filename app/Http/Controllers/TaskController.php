@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Rupes\JetConverter\JetConverter;
-use Intern\JwtConverter\JwtConverter; // Imported the new JWT Package
+use Intern\JwtConverter\JwtConverter;
 
 class TaskController extends Controller
 {
-    // READ: Display all tasks & generate secure JWT token
+    // READ: Display user-specific tasks & generate secure JWT token
     public function index()
     {
-        $tasks = Task::latest()->get();
+        // Grab only the tasks belonging to the authenticated user
+        $tasks = Task::where('user_id', Auth::id())
+            ->latest()
+            ->get();
 
-        // Initialize the new JwtConverter package
+        // Initialize the JwtConverter package
         $jwtProcessor = new JwtConverter();
 
         // Prepare the payload array data from your database records
@@ -28,16 +32,14 @@ class TaskController extends Controller
         }
 
         // Encode the payload into a cryptographically secure token
-        // (Note: ensure your JwtConverter class has a matching method inside its src/JwtConverter.php)
         $secureJwtToken = '';
         try {
-            // Adjust this function call name if you named it differently in your package file
             $secureJwtToken = $jwtProcessor->encode(['tasks' => $taskPayload]);
         } catch (\Exception $e) {
             $secureJwtToken = 'JWT token generation pending package logic: ' . $e->getMessage();
         }
 
-        // Pass both tasks and the token down to your todo layout view
+        // Pass tasks and token to the todo view layout
         return view('todo', compact('tasks', 'secureJwtToken'));
     }
 
@@ -48,14 +50,15 @@ class TaskController extends Controller
             'title' => 'required|max:255',
         ]);
 
-        // Initialize your custom package logic
+        // Initialize your custom package logic transformation
         $converter = new JetConverter();
         $processedTitle = $converter->convert($request->title);
 
-        // Create the task with the transformed package output
+        // Create the task with the transformed package output tied to the logged-in user
         Task::create([
             'title' => $processedTitle,
             'is_completed' => false,
+            'user_id' => Auth::id(),
         ]);
 
         return redirect()->back()->with('success', 'Task created successfully with JetConverter!');
@@ -64,6 +67,10 @@ class TaskController extends Controller
     // UPDATE: Toggle task completion status
     public function toggleStatus(Task $task)
     {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         $task->update([
             'is_completed' => !$task->is_completed,
         ]);
@@ -74,20 +81,20 @@ class TaskController extends Controller
     // EDIT: Show the edit form for a specific task
     public function edit(int $id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::where('user_id', Auth::id())->findOrFail($id);
         return view('tasks.edit', compact('task'));
     }
 
-    // UPDATE: Save the actual edited text title change
+    // UPDATE: Save edited text title updates
     public function update(Request $request, int $id)
     {
         $request->validate([
             'title' => 'required|max:255',
         ]);
 
-        $task = Task::findOrFail($id);
+        $task = Task::where('user_id', Auth::id())->findOrFail($id);
 
-        // Run the custom package conversion on updates too!
+        // Run the custom package conversion on updates
         $converter = new JetConverter();
         $processedTitle = $converter->convert($request->title);
 
@@ -98,9 +105,13 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
     }
 
-    // DELETE: Delete a task
+    // DELETE: Delete a task safely
     public function destroy(Task $task)
     {
+        if ($task->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         $task->delete();
 
         return redirect()->back()->with('success', 'Task deleted successfully.');
