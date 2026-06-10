@@ -19,43 +19,58 @@
             box-sizing: border-box;
         }
 
-        .todo-container {
+        .todo-container,
+        .jwt-dashboard {
             background-color: #ffffff;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             box-sizing: border-box;
+            margin-bottom: 25px;
         }
 
-        h2 {
+        h2,
+        h3 {
             margin-top: 0;
             color: #333;
-            font-size: 24px;
             font-weight: 700;
             border-bottom: 2px solid #eaeaea;
             padding-bottom: 10px;
         }
 
-        .input-group {
+        h2 {
+            font-size: 24px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        .input-group,
+        .contact-form {
             display: flex;
             gap: 10px;
             margin-bottom: 25px;
         }
 
-        .input-group input {
+        .contact-form {
+            flex-direction: column;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-group input,
+        .contact-form input {
             flex: 1;
             padding: 10px 14px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #4f46e5;
         }
 
         .btn-add {
@@ -66,11 +81,6 @@
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-add:hover {
-            background-color: #4338ca;
         }
 
         .task-list {
@@ -87,12 +97,6 @@
             padding: 12px 16px;
             border-radius: 8px;
             border-left: 4px solid #cbd5e1;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-
-        .task-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .task-item.completed {
@@ -105,23 +109,8 @@
             color: #94a3b8;
         }
 
-        .task-title-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            cursor: pointer;
-        }
-
-        .task-title {
-            font-size: 15px;
-            color: #334155;
-            word-break: break-word;
-        }
-
         .action-buttons {
             display: flex;
-            align-items: center;
             gap: 8px;
         }
 
@@ -131,44 +120,22 @@
             font-size: 13px;
             font-weight: 600;
             padding: 6px 12px;
-            border-radius: 4px;
-            transition: background 0.2s;
         }
 
-        .btn-edit:hover {
-            background-color: #eff6ff;
-        }
-
-        .btn-delete {
+        .btn-delete,
+        .btn-action-del {
             background: none;
             border: none;
             color: #dc2626;
             font-size: 13px;
             font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.2s;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
 
-        .btn-delete:hover {
+        .btn-action-del:hover {
             background-color: #fef2f2;
-        }
-
-        .toggle-form {
-            display: inline;
-        }
-
-        .jwt-dashboard {
-            width: 100%;
-            max-width: 500px;
-            margin-top: 25px;
-            padding: 20px;
-            background-color: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            box-sizing: border-box;
         }
 
         .jwt-header {
@@ -204,8 +171,6 @@
             word-break: break-all;
             max-height: 120px;
             overflow-y: auto;
-            line-height: 1.5;
-            border: 1px solid #334155;
         }
 
         .decoded-output {
@@ -215,10 +180,9 @@
             border-radius: 8px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 12px;
-            color: #334155;
-            margin: 0;
-            max-height: 150px;
+            max-height: 220px;
             overflow-y: auto;
+            white-space: pre-wrap;
         }
 
         .user-bar {
@@ -230,28 +194,6 @@
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .user-info {
-            font-size: 14px;
-            font-weight: 600;
-            color: #334155;
-        }
-
-        .btn-logout {
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-logout:hover {
-            background-color: #dc2626;
-        }
-
         .success-message {
             background-color: #dcfce7;
             color: #166534;
@@ -259,36 +201,70 @@
             border-radius: 6px;
             margin-bottom: 15px;
             font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .error-message {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .api-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .api-table th {
+            background-color: #f8fafc;
+            color: #64748b;
+            text-align: left;
+            padding: 10px;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .api-table td {
+            padding: 10px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
         }
     </style>
 </head>
 
 <body>
 
+    @if(session('success'))
+    <div class="success-message">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if(session('api_error'))
+    <div class="error-message">
+        {{ session('api_error') }}
+    </div>
+    @endif
+
     <div class="todo-container">
-
         <div class="user-bar">
-
-            <div class="user-info">
-                Welcome, {{ auth()->user()->name }}
-            </div>
-
+            <div class="user-info">Welcome, {{ auth()->user()->name }}</div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="btn-logout">
-                    Logout
-                </button>
+                <button type="submit" style="background-color:#ef4444; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">Logout</button>
             </form>
-
         </div>
 
         <h2>Tasks To-Do</h2>
-
-        @if(session('success'))
-        <div class="success-message">
-            {{ session('success') }}
-        </div>
-        @endif
 
         <form action="{{ route('tasks.store') }}" method="POST" class="input-group">
             @csrf
@@ -297,76 +273,105 @@
         </form>
 
         <div class="task-list">
-            @php
-            // Instantiate the JetConverter service to reverse strings on demand
-            $reverter = new \Rupes\JetConverter\JetConverter();
-            @endphp
-
+            @php $reverter = new \Rupes\JetConverter\JetConverter(); @endphp
             @forelse($tasks as $task)
             <div class="task-item {{ $task->is_completed ? 'completed' : '' }}">
-
-                <form action="{{ route('tasks.toggle', $task->id) }}" method="POST" class="toggle-form" id="toggle-{{ $task->id }}">
+                <form action="{{ route('tasks.toggle', $task->id) }}" method="POST" style="display:inline;" id="toggle-{{ $task->id }}">
                     @csrf
                     @method('PATCH')
-                    <div class="task-title-wrapper" onclick="document.getElementById('toggle-{{ $task->id }}').submit();">
-                        <input type="checkbox" {{ $task->is_completed ? 'checked' : '' }} style="cursor: pointer;">
-
+                    <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="document.getElementById('toggle-{{ $task->id }}').submit();">
+                        <input type="checkbox" {{ $task->is_completed ? 'checked' : '' }}>
                         <div style="display: flex; flex-direction: column;">
                             <span class="task-title">{{ $reverter->convert($task->title) }}</span>
-
-                            <small style="color: #94a3b8; font-size: 11px; margin-top: 2px;">
-                                Package Output: {{ $task->title }}
-                            </small>
+                            <small style="color: #94a3b8; font-size: 11px;">Package Output: {{ $task->title }}</small>
                         </div>
                     </div>
                 </form>
-
                 <div class="action-buttons">
                     <a href="{{ route('tasks.edit', $task->id) }}" class="btn-edit">Edit</a>
-
                     <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
+                        @csrf @method('DELETE')
                         <button type="submit" class="btn-delete">Delete</button>
                     </form>
                 </div>
-
             </div>
             @empty
-            <p style="color: #94a3b8; text-align: center; font-size: 14px;">No tasks available. Add one above!</p>
+            <p style="color: #94a3b8; text-align: center; font-size: 14px;">No tasks available.</p>
             @endforelse
         </div>
+    </div>
+
+    <div class="todo-container">
+        <h3>Create External Contact (cURL POST)</h3>
+        <form action="{{ route('contacts.store') }}" method="POST" class="contact-form">
+            @csrf
+            <input type="text" name="name" placeholder="Contact Full Name (e.g. Anil Sharma)" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="text" name="phone" placeholder="Phone Number" required>
+            <button type="submit" class="btn-add" style="margin-top:5px;">Send POST Request</button>
+        </form>
     </div>
 
     <div class="jwt-dashboard">
         <div class="jwt-header">
             <span>Secure Synchronization Token</span>
-            <span class="jwt-badge">JwtConverter Active</span>
+            <span class="jwt-badge">Active</span>
         </div>
-        <!-- <p style="font-size: 13px; color: #64748b; margin: 0 0 12px 0; line-height: 1.4;">
-            This cryptographically signed string is generated automatically by your custom package using the task list payload array:
-        </p> -->
         <div class="jwt-terminal" style="margin-bottom: 20px;">
-            {{ $secureJwtToken ?? 'No sync token has been loaded for this task array execution.' }}
+            {{ $secureJwtToken }}
         </div>
 
         @php
         $decoderPackage = new \Intern\JwtConverter\JwtConverter();
-        $extractedPayload = isset($secureJwtToken) && !str_contains($secureJwtToken, 'pending package logic')
-        ? $decoderPackage->decode($secureJwtToken)
-        : null;
+        try {
+        $decodedData = $decoderPackage->decode($secureJwtToken);
+        } catch (\Exception $e) {
+        $decodedData = ['error' => $e->getMessage()];
+        }
         @endphp
 
-        <div class="jwt-header" style="border-top: 1px solid #f1f5f9; padding-top: 15px; margin-top: 15px;">
+        <div class="jwt-header">
             <span>Decoded Data Array</span>
             <span class="jwt-badge" style="background-color: #d1fae5; color: #065f46;">Verified</span>
         </div>
-        <!-- <p style="font-size: 13px; color: #64748b; margin: 0 0 12px 0; line-height: 1.4;">
-            Your package read the signed token string directly from your application flow, validated its payload integrity, and parsed it back out:
-        </p> -->
-        <pre class="decoded-output">{{
-            $extractedPayload ? print_r($extractedPayload, true) : 'Waiting for a valid token string sequence...' 
-        }}</pre>
+        <pre class="decoded-output">{{ print_r($decodedData, true) }}</pre>
+
+        <div class="jwt-header" style="margin-top: 15px;">
+            <span>Live JSONPlaceholder Users (cURL GET)</span>
+            <span class="jwt-badge" style="background-color: #fef3c7; color: #92400e;">External API</span>
+        </div>
+
+        @if(empty($externalContacts))
+        <p style="font-size: 13px; color: #64748b; text-align: center; margin: 10px 0;">No external contacts found or connection offline.</p>
+        @else
+        <div style="max-height: 250px; overflow-y: auto;">
+            <table class="api-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($externalContacts as $contact)
+                    <tr>
+                        <td>{{ $contact['firstName'] }}</td>
+                        <td>{{ $contact['email'] }}</td>
+                        <td>{{ $contact['phoneNumber'] }}</td>
+                        <td>
+                            <form action="{{ route('contacts.destroy', $contact['subjectId']) }}" method="POST" style="display:inline;">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-action-del">Wipe</button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @endif
     </div>
 
 </body>

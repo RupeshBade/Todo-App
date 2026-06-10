@@ -4,25 +4,25 @@ A Laravel-based To-Do application with authentication, CRUD operations, database
 
 ## Features
 
-- User Registration
-- User Login
-- User Logout
-- Task Creation
-- Task Editing
-- Task Deletion
-- Task Completion Toggle
-- User-specific Task Ownership
-- MySQL Database Integration
-- JWT Token Generation using Custom Package
-- JetConverter Custom Package Integration
+-   User Registration
+-   User Login
+-   User Logout
+-   Task Creation
+-   Task Editing
+-   Task Deletion
+-   Task Completion Toggle
+-   User-specific Task Ownership
+-   MySQL Database Integration
+-   JWT Token Generation using Custom Package
+-   JetConverter Custom Package Integration
 
 ## Tech Stack
 
-- Laravel 12/13
-- PHP
-- MySQL
-- Laravel Breeze
-- Blade Templates
+-   Laravel 12/13
+-   PHP
+-   MySQL
+-   Laravel Breeze
+-   Blade Templates
 
 ## Authentication
 
@@ -30,9 +30,9 @@ Authentication is implemented using Laravel Breeze.
 
 Users can:
 
-- Register
-- Login
-- Logout
+-   Register
+-   Login
+-   Logout
 
 Each user can only access and manage their own tasks.
 

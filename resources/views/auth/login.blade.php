@@ -17,9 +17,9 @@
             <x-input-label for="password" :value="__('Password')" />
 
             <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+                type="password"
+                name="password"
+                required autocomplete="current-password" />
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
@@ -34,9 +34,9 @@
 
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                {{ __('Forgot your password?') }}
+            </a>
             @endif
 
             <x-primary-button class="ms-3">
@@ -44,4 +44,65 @@
             </x-primary-button>
         </div>
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            // Dynamically appends warning message containers directly below inputs
+            const createErrorPlaceholder = (inputEl, id) => {
+                if (!document.getElementById(id)) {
+                    const small = document.createElement('small');
+                    small.id = id;
+                    small.style.color = '#ef4444'; // Tailwind Red text
+                    small.style.display = 'block';
+                    small.style.marginTop = '4px';
+                    small.style.fontSize = '0.875rem';
+                    inputEl.parentNode.appendChild(small);
+                }
+                return document.getElementById(id);
+            };
+
+            // Immediate Email input checks
+            emailInput.addEventListener('input', function() {
+                const errorEl = createErrorPlaceholder(emailInput, 'js-login-email-error');
+                const val = emailInput.value;
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (val.trim() === "") {
+                    errorEl.textContent = "Email address is required.";
+                } else if (!emailPattern.test(val)) {
+                    errorEl.textContent = "Please provide a structural email (e.g., user@domain.com).";
+                } else {
+                    errorEl.textContent = "";
+                }
+            });
+
+            // Immediate Strict Password input checks
+            passwordInput.addEventListener('input', function() {
+                const errorEl = createErrorPlaceholder(passwordInput, 'js-login-password-error');
+                const val = passwordInput.value;
+
+                const hasLength = val.length >= 8;
+                const hasUpper = /[A-Z]/.test(val);
+                const hasLower = /[a-z]/.test(val);
+                const hasNumber = /[0-9]/.test(val);
+                const hasSpecial = /[\W_]/.test(val);
+
+                if (val.trim() === "") {
+                    errorEl.textContent = "Password is required.";
+                } else if (!hasLength) {
+                    errorEl.textContent = "Password must be at least 8 characters long.";
+                } else if (!hasUpper || !hasLower) {
+                    errorEl.textContent = "Password requires mixed case lettering.";
+                } else if (!hasNumber) {
+                    errorEl.textContent = "Password requires at least one number.";
+                } else if (!hasSpecial) {
+                    errorEl.textContent = "Password requires a special character component.";
+                } else {
+                    errorEl.textContent = "";
+                }
+            });
+        });
+    </script>
 </x-guest-layout>

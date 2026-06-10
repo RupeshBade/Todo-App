@@ -7,21 +7,38 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Rupes\JetConverter\JetConverter;
 use Intern\JwtConverter\JwtConverter;
+use App\Facades\JsonPlaceholderCurl;
 
 class TaskController extends Controller
 {
-    // READ: Display user-specific tasks & generate secure JWT token
+    /**
+     * FETCH (GET): Grab live profiles from JSONPlaceholder via audited cURL engine.
+     */
     public function index()
     {
-        // Grab only the tasks belonging to the authenticated user
-        $tasks = Task::where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        $tasks = Task::where('user_id', Auth::id())->latest()->get();
 
-        // Initialize the JwtConverter package
+        // Fire cURL custom engine pipeline via Facade
+        $apiResponse = JsonPlaceholderCurl::get('/users');
+        $externalContacts = [];
+
+        if (is_array($apiResponse) && isset($apiResponse['error'])) {
+            // Flash a non-blocking error status message directly to your dashboard interface
+            session()->now('api_error', 'External API Gateway Alert: ' . $apiResponse['message']);
+        } elseif (is_array($apiResponse)) {
+            foreach ($apiResponse as $user) {
+                $externalContacts[] = [
+                    'subjectId'   => $user['id'] ?? '',
+                    'firstName'   => $user['name'] ?? '',
+                    'lastName'    => '',
+                    'email'       => $user['email'] ?? '',
+                    'phoneNumber' => $user['phone'] ?? ''
+                ];
+            }
+        }
+
+        // Handle JWT Cryptographic Synchronizer processing
         $jwtProcessor = new JwtConverter();
-
-        // Prepare the payload array data from your database records
         $taskPayload = [];
         foreach ($tasks as $task) {
             $taskPayload[] = [
@@ -31,32 +48,81 @@ class TaskController extends Controller
             ];
         }
 
-        // Encode the payload into a cryptographically secure token
-        $secureJwtToken = '';
+        $combinedPayload = [
+            'tasks' => $taskPayload,
+            'external_contacts' => $externalContacts
+        ];
+
         try {
-            $secureJwtToken = $jwtProcessor->encode(['tasks' => $taskPayload]);
+            $secureJwtToken = $jwtProcessor->encode($combinedPayload);
         } catch (\Exception $e) {
-            $secureJwtToken = 'JWT token generation pending package logic: ' . $e->getMessage();
+            $secureJwtToken = 'JWT Error: ' . $e->getMessage();
         }
 
-        // Pass tasks and token to the todo view layout
-        return view('todo', compact('tasks', 'secureJwtToken'));
+        return view('todo', compact('tasks', 'secureJwtToken', 'externalContacts'));
     }
 
-    // CREATE: Store a new task using your JetConverter package
-    public function store(Request $request)
+    /**
+     * STORE (POST): Send payload dataset to JSONPlaceholder via cURL facade.
+     */
+    public function storeContact(Request $request)
     {
         $request->validate([
-            'title' => 'required|max:255',
+            'name' => 'required|max:255',
+            'email' => 'required|email',
+            'phone' => 'required'
         ]);
 
-        // Initialize your custom package logic transformation
-        $converter = new JetConverter();
-        $processedTitle = $converter->convert($request->title);
+        $payloadData = [
+            'name'  => $request->input('name'),
+            'email' => $request->input('email'),
+            'phone' => $request->input('phone')
+        ];
 
-        // Create the task with the transformed package output tied to the logged-in user
+        $response = JsonPlaceholderCurl::post('/users', $payloadData);
+
+        // Trap errors during post request creation
+        if (is_array($response) && isset($response['error'])) {
+            return redirect()->back()->with('api_error', 'Failed to store contact: ' . $response['message']);
+        }
+
+        return redirect()->back()->with('success', 'Contact created on JSONPlaceholder via cURL! Returned ID: ' . ($response['id'] ?? '11'));
+    }
+
+    /**
+     * DELETE (DELETE): Terminate resource endpoint path via cURL facade.
+     */
+    public function deleteContact($id)
+    {
+        $response = JsonPlaceholderCurl::delete('/users/' . $id);
+
+        if (is_array($response) && isset($response['error'])) {
+            return redirect()->back()->with('api_error', 'Failed to remove contact: ' . $response['message']);
+        }
+
+        return redirect()->back()->with('success', 'Contact ID #' . $id . ' successfully wiped via JSONPlaceholder API stream!');
+    }
+
+    public function showRawJson()
+    {
+        $apiResponse = JsonPlaceholderCurl::get('/users');
+
+        if (is_array($apiResponse) && isset($apiResponse['error'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $apiResponse['message']
+            ], 500);
+        }
+
+        return response()->json($apiResponse);
+    }
+
+    public function store(Request $request, JetConverter $converter)
+    {
+        $request->validate(['title' => 'required|max:255']);
+
         Task::create([
-            'title' => $processedTitle,
+            'title' => $converter->convert($request->title),
             'is_completed' => false,
             'user_id' => Auth::id(),
         ]);
@@ -64,56 +130,33 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Task created successfully with JetConverter!');
     }
 
-    // UPDATE: Toggle task completion status
     public function toggleStatus(Task $task)
     {
-        if ($task->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $task->update([
-            'is_completed' => !$task->is_completed,
-        ]);
-
+        if ($task->user_id !== Auth::id()) abort(403);
+        $task->update(['is_completed' => !$task->is_completed]);
         return redirect()->back()->with('success', 'Task status updated.');
     }
 
-    // EDIT: Show the edit form for a specific task
     public function edit(int $id)
     {
         $task = Task::where('user_id', Auth::id())->findOrFail($id);
         return view('tasks.edit', compact('task'));
     }
 
-    // UPDATE: Save edited text title updates
-    public function update(Request $request, int $id)
+    public function update(Request $request, int $id, JetConverter $converter)
     {
-        $request->validate([
-            'title' => 'required|max:255',
-        ]);
-
+        $request->validate(['title' => 'required|max:255']);
         $task = Task::where('user_id', Auth::id())->findOrFail($id);
 
-        // Run the custom package conversion on updates
-        $converter = new JetConverter();
-        $processedTitle = $converter->convert($request->title);
-
-        $task->update([
-            'title' => $processedTitle,
-        ]);
+        $task->update(['title' => $converter->convert($request->title)]);
 
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
     }
 
-    // DELETE: Delete a task safely
     public function destroy(Task $task)
     {
-        if ($task->user_id !== Auth::id()) {
-            abort(403);
-        }
-
+        if ($task->user_id !== Auth::id()) abort(403);
         $task->delete();
-
         return redirect()->back()->with('success', 'Task deleted successfully.');
     }
 }
