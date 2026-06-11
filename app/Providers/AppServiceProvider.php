@@ -12,8 +12,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Links the custom facade accessor string directly to our cURL Engine service
-        $this->app->singleton('jsonplaceholder-curl', function ($app) {
+        // Links the updated custom facade accessor string directly to our cURL Engine service
+        $this->app->singleton('mockapi-curl', function ($app) {
             return new CurlApiService();
         });
     }

@@ -4,14 +4,19 @@ namespace App\Services;
 
 class CurlApiService
 {
-    protected $baseUrl = 'https://jsonplaceholder.typicode.com';
+    // Pointing directly to your live, permanently updatable MockAPI server
+    protected $baseUrl = 'https://6a2912e8f59cb8f65f1c674f.mockapi.io/api/v1';
 
     /**
-     * Core request engine to execute cURL operations.
+     * Core request engine to execute cURL operations safely.
      */
     protected function request(string $method, string $endpoint, array $data = [])
     {
-        $url = $this->baseUrl . $endpoint;
+        // 🌟 FIXED STRATEGY: Isolate base and endpoint without string replacement bugs
+        $base = rtrim($this->baseUrl, '/');
+        $path = '/' . ltrim($endpoint, '/');
+        $url = $base . $path;
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -22,12 +27,13 @@ class CurlApiService
             'Accept: application/json'
         ]);
 
+        // Only bind postfields on writing states with payload content
         if (!empty($data) && in_array($method, ['POST', 'PUT', 'PATCH'])) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         }
 
         $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         // Transport-level connection failure handling
         if (curl_errno($ch)) {
@@ -39,7 +45,10 @@ class CurlApiService
         curl_close($ch);
 
         if ($httpCode >= 400) {
-            return ['error' => true, 'message' => "API Server returned HTTP Status Code: $httpCode"];
+            return [
+                'error' => true,
+                'message' => "API Server returned HTTP Status Code: $httpCode. Raw Response: " . substr($response, 0, 150)
+            ];
         }
 
         return json_decode($response, true);
