@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use App\Facades\MockApiCurl;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -16,27 +18,23 @@ class TaskController extends Controller
     {
         $tasks = Task::where('user_id', Auth::id())->latest()->get();
 
-        // Pull active data collections directly from your specific MockAPI backend link
         $apiResponse = MockApiCurl::get('/users');
         $externalContacts = [];
 
+        // In TaskController.php, update the mapping inside the index() method:
         if (is_array($apiResponse) && !isset($apiResponse['error'])) {
             foreach ($apiResponse as $user) {
-                if (!is_array($user)) {
-                    continue;
-                }
-
-                // Normalizes keys to match MockAPI's schema variables
                 $externalContacts[] = [
-                    'id'          => isset($user['id']) ? (string)$user['id'] : '0',
-                    'firstName'   => $user['name'] ?? 'Unnamed Profile',
-                    'email'       => $user['Email'] ?? 'No Email Profile Linked',
-                    'phoneNumber' => $user['phone'] ?? 'No Address Data'
+                    // Map the 'user_id' from your API to 'id' so the Blade file recognizes it
+                    'id'    => $user['user_id'] ?? $user['id'] ?? '0',
+                    'name'  => $user['name'] ?? 'Unnamed',
+                    'Email' => $user['Email'] ?? 'No Email',
+                    'phone' => $user['phone'] ?? 'No Phone'
                 ];
             }
         }
 
-        // Bundle data strings for token visualizer mapping
+        // Prepared for view
         $taskPayload = [];
         foreach ($tasks as $task) {
             $taskPayload[] = [
@@ -59,10 +57,13 @@ class TaskController extends Controller
         } catch (\Exception $e) {
             $secureJwtToken = 'Token Generation Error: ' . $e->getMessage();
         }
+        // Temporary debug: check exactly what keys the API provides
+        // dd($externalContacts);
 
-        return view('todo', compact('tasks', 'secureJwtToken', 'externalContacts'));
+        return view('todo', compact('tasks', 'secureJwtToken', 'externalContacts', 'taskPayload'));
     }
 
+    // --- Standard CRUD Methods ---
     public function store(Request $request)
     {
         $request->validate(['title' => 'required|max:255']);
@@ -102,9 +103,7 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Local task record completely removed.');
     }
 
-    /**
-     * Post a new user to MockAPI.
-     */
+    // --- External Sync Methods ---
     public function storeContact(Request $request)
     {
         $request->validate([
@@ -124,25 +123,57 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'User synced to MockAPI successfully!');
     }
 
-    /**
-     * Delete a user directly from your MockAPI endpoint list.
-     */
-    /**
-     * Delete a user directly from your MockAPI endpoint list.
-     */
     public function wipeContact($id)
     {
-        if (!empty($id) && $id !== '0') {
-            // This triggers the custom Curl service facade correctly
-            \App\Facades\MockApiCurl::delete('/users/' . $id);
+        if (empty($id) || $id === '0') {
+            return redirect()->back()->with('api_error', 'Invalid User ID context received.');
+        }
+
+        // Updated to use the Facade as requested
+        $response = MockApiCurl::delete('/users/' . $id);
+
+        if (!isset($response['error'])) {
             return redirect()->back()->with('success', 'User completely wiped from MockAPI!');
         }
-        return redirect()->back()->with('api_error', 'Invalid User ID context received.');
+
+        return redirect()->back()->with('api_error', 'Failed to wipe: ' . ($response['message'] ?? 'Unknown error'));
     }
 
+    // --- API JSON Methods (Postman Endpoints) ---
     public function showRawJson()
     {
         $apiResponse = MockApiCurl::get('/users');
         return response()->json($apiResponse);
+    }
+
+    public function storeRawJson(Request $request)
+    {
+        $apiResponse = MockApiCurl::post('/users', $request->all());
+        return response()->json([
+            'status' => 'Successfully posted via Postman!',
+            'mockapi_response' => $apiResponse
+        ], 201);
+    }
+
+    public function updateRawJson(Request $request, $id)
+    {
+        $mockApiUrl = 'https://6a2912e8f59cb8f65f1c674f.mockapi.io/api/v1/users/' . $id;
+        $response = Http::patch($mockApiUrl, $request->except(['id'])); // Ensure this uses patch()
+        return response()->json(['status' => $response->successful() ? 'Success' : 'Failed', 'mockapi_response' => $response->json()], $response->status());
+    }
+
+    public function destroyRawJson($id)
+    {
+        // The ID in the URL parameter is what you are passing from Postman
+        $mockApiUrl = 'https://6a2912e8f59cb8f65f1c674f.mockapi.io/api/v1/users/' . $id;
+
+        $response = \Illuminate\Support\Facades\Http::delete($mockApiUrl);
+
+        return response()->json([
+            'status' => $response->successful() ? 'Success' : 'Failed',
+            'url_attempted' => $mockApiUrl, // Add this to see what URL is being called
+            'api_response' => $response->json(),
+            'status_code' => $response->status()
+        ], $response->status());
     }
 }

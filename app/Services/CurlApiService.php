@@ -12,7 +12,6 @@ class CurlApiService
      */
     protected function request(string $method, string $endpoint, array $data = [])
     {
-        // 🌟 FIXED STRATEGY: Isolate base and endpoint without string replacement bugs
         $base = rtrim($this->baseUrl, '/');
         $path = '/' . ltrim($endpoint, '/');
         $url = $base . $path;

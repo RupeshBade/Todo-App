@@ -117,6 +117,11 @@
             border-radius: 8px;
         }
 
+        .completed .task-title {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
         .task-text {
             font-size: 1.05rem;
             font-weight: 500;
@@ -161,6 +166,17 @@
             border-left: 4px solid #3b82f6;
         }
 
+        .payload-box {
+            background-color: #1e293b;
+            color: #fbbf24;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            border-left: 4px solid #fbbf24;
+        }
+
         .section-badge {
             display: inline-block;
             padding: 4px 8px;
@@ -174,11 +190,6 @@
         .badge-active {
             background-color: #e0e7ff;
             color: #4338ca;
-        }
-
-        .badge-verified {
-            background-color: #d1fae5;
-            color: #065f46;
         }
 
         .badge-external {
@@ -216,15 +227,6 @@
             background-color: #f9fafb;
             color: #4b5563;
             font-weight: 600;
-        }
-
-        .btn-action-del {
-            background: none;
-            border: none;
-            color: #dc2626;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -266,25 +268,18 @@
                     <div class="task-text" onclick="document.getElementById('toggle-{{ $task->id }}').submit();">
                         <input type="checkbox" {{ $task->is_completed ? 'checked' : '' }} style="cursor:pointer;">
                         <div>
-                            <div style="font-size: 1.05rem; font-weight: 600; color: #1f2937;">
+                            <div class="task-title" style="font-size: 1.05rem; font-weight: 600; color: #1f2937;">
                                 {{ $task->title }}
                             </div>
-
                             <small style="color: #4f46e5; font-size: 0.8rem; display:block; margin-top:4px; font-family: monospace;">
                                 @php
                                 $output = $task->title;
                                 if (class_exists('\Rupes\JetConverter\JetConverter')) {
                                 $reverter = new \Rupes\JetConverter\JetConverter();
-                                if (method_exists($reverter, 'reverseString')) {
-                                $output = $reverter->reverseString($task->title);
-                                } elseif (method_exists($reverter, 'reversedString')) {
-                                $output = $reverter->reversedString($task->title);
-                                } elseif (method_exists($reverter, 'convert')) {
-                                $output = $reverter->convert($task->title);
-                                } else {
-                                // Fallback helper processing
-                                $output = strrev($task->title);
-                                }
+                                if (method_exists($reverter, 'reverseString')) $output = $reverter->reverseString($task->title);
+                                elseif (method_exists($reverter, 'reversedString')) $output = $reverter->reversedString($task->title);
+                                elseif (method_exists($reverter, 'convert')) $output = $reverter->convert($task->title);
+                                else $output = strrev($task->title);
                                 } else {
                                 $output = strrev($task->title);
                                 }
@@ -317,8 +312,14 @@
     </div>
 
     <div class="container">
-        <div class="section-title" style="margin-top:0;">Create External Contact (cURL POST)</div>
+        <div class="section-title" style="margin-top:0;">Decoded Task Payload Array</div>
+        <div class="payload-box">
+            <pre>{{ json_encode($taskPayload ?? [], JSON_PRETTY_PRINT) }}</pre>
+        </div>
+    </div>
 
+    <div class="container">
+        <div class="section-title" style="margin-top:0;">Create External Contact (cURL POST)</div>
         <form action="{{ route('contacts.store') }}" method="POST" style="margin-bottom: 20px;">
             @csrf
             <input type="text" name="name" class="input-control" placeholder="Contact Full Name" required style="width:100%; margin-bottom:12px; box-sizing:border-box;">
@@ -350,13 +351,13 @@
                     <td>{{ $contact['phone'] ?? $contact['phoneNumber'] ?? 'No Phone' }}</td>
                     <td>
                         @if(isset($contact['id']) && $contact['id'] !== '0')
-                        <form action="{{ route('contacts.wipe', $contact['id']) }}" method="POST" style="display:inline;">
+                        <form action="{{ route('wipeContact', $contact['id']) }}" method="POST" onsubmit="return confirm('Are you sure?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn-action-del">Wipe</button>
+                            <button type="submit" style="color:#dc2626; cursor:pointer; font-weight:bold; border:none; background:none;">Wipe</button>
                         </form>
                         @else
-                        <button class="btn-action-del" disabled style="opacity:0.4;">Wipe</button>
+                        <button type="button" style="color:#9ca3af; cursor:not-allowed; border:none; background:none;" disabled>Unavailable</button>
                         @endif
                     </td>
                 </tr>
