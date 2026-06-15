@@ -11,7 +11,7 @@ class CurlApiService
      * Core request engine to execute cURL operations safely.
      */
     protected function request(string $method, string $endpoint, array $data = [])
-    {
+    { 
         $base = rtrim($this->baseUrl, '/');
         $path = '/' . ltrim($endpoint, '/');
         $url = $base . $path;

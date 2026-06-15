@@ -38,8 +38,6 @@ Route::middleware(['auth'])->group(function () {
 // Wipe contact route (placed outside or inside auth depending on your preference)
 Route::delete('/wipe-contact/{id}', [TaskController::class, 'wipeContact'])->name('wipeContact');
 
-// Patch route for raw JSON
-// Route::patch('/api/api-users/{id}', [TaskController::class, 'updateRawJson']);
 
 // Authentication routes
 require __DIR__ . '/auth.php';

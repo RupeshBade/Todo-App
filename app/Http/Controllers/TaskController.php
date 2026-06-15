@@ -75,20 +75,20 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Local database task entry recorded.');
     }
 
-    public function toggleStatus($id)
+    public function toggleStatus(int $id)
     {
         $task = Task::where('user_id', Auth::id())->findOrFail($id);
         $task->update(['is_completed' => !$task->is_completed]);
         return redirect()->back();
     }
 
-    public function edit($id)
+    public function edit(int $id)
     {
         $task = Task::where('user_id', Auth::id())->findOrFail($id);
         return view('tasks.edit', compact('task'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id)
     {
         $task = Task::where('user_id', Auth::id())->findOrFail($id);
         $request->validate(['title' => 'required|max:255']);
@@ -96,7 +96,7 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')->with('success', 'Task record updated.');
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $task = Task::where('user_id', Auth::id())->findOrFail($id);
         $task->delete();
@@ -123,7 +123,7 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'User synced to MockAPI successfully!');
     }
 
-    public function wipeContact($id)
+    public function wipeContact(int $id)
     {
         if (empty($id) || $id === '0') {
             return redirect()->back()->with('api_error', 'Invalid User ID context received.');
@@ -155,14 +155,20 @@ class TaskController extends Controller
         ], 201);
     }
 
-    public function updateRawJson(Request $request, $id)
+    public function updateRawJson(Request $request, int $id)
     {
         $mockApiUrl = 'https://6a2912e8f59cb8f65f1c674f.mockapi.io/api/v1/users/' . $id;
         $response = Http::patch($mockApiUrl, $request->except(['id'])); // Ensure this uses patch()
-        return response()->json(['status' => $response->successful() ? 'Success' : 'Failed', 'mockapi_response' => $response->json()], $response->status());
+        return response()->json(
+            [
+                'status' => $response->successful() ? 'Success' : 'Failed',
+                'mockapi_response' => $response->json()
+            ],
+            $response->status()
+        );
     }
 
-    public function destroyRawJson($id)
+    public function destroyRawJson(int $id)
     {
         // The ID in the URL parameter is what you are passing from Postman
         $mockApiUrl = 'https://6a2912e8f59cb8f65f1c674f.mockapi.io/api/v1/users/' . $id;
