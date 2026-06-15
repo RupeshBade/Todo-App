@@ -15,6 +15,9 @@ A Laravel-based To-Do application with authentication, CRUD operations, database
 -   MySQL Database Integration
 -   JWT Token Generation using Custom Package
 -   JetConverter Custom Package Integration
+-   cURL facade creation
+-   CRUD operation in custom api using cURL facade
+-   Updatable data in live table through postman
 
 ## Tech Stack
 
