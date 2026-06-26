@@ -3,9 +3,17 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
+use GeniusSystem\CurlFacade\CurlFacade;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/test-api', function () {
+    // This will fetch from mock_api defined in your config
+    $data = CurlFacade::get('mock_api', '/users');
+
+    return $data;
 });
 
 // Authenticated Routes
@@ -28,6 +36,8 @@ Route::middleware(['auth'])->group(function () {
 
     // 2. MockAPI Stream Endpoint Synchronizations
     Route::post('/contacts', [TaskController::class, 'storeContact'])->name('contacts.store');
+    Route::post('/students', [TaskController::class, 'storeStudent'])->name('students.store');
+    
 
     // 3. Profile Routings
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,6 +47,10 @@ Route::middleware(['auth'])->group(function () {
 
 // Wipe contact route (placed outside or inside auth depending on your preference)
 Route::delete('/wipe-contact/{id}', [TaskController::class, 'wipeContact'])->name('wipeContact');
+Route::delete('/wipe-student/{id}', [TaskController::class, 'wipeStudent'])->name('wipeStudent');
+
+
+
 
 
 // Authentication routes

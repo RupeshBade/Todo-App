@@ -6,4 +6,5 @@ return [
     AppServiceProvider::class,
     Intern\JwtConverter\JwtConverterServiceProvider::class,
     Rupes\JetConverter\JetConverterServiceProvider::class,
+    GeniusSystem\CurlFacade\CurlServiceProvider::class
 ];

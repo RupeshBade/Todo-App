@@ -228,6 +228,130 @@
             color: #4b5563;
             font-weight: 600;
         }
+
+        .posts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.8rem;
+        }
+
+        .posts-table th,
+        .posts-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 5px solid #e5e7eb;
+        }
+
+        .posts-table th {
+            background-color: #354565;
+            color: #999999;
+            font-weight: 700;
+        }
+
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .student-table th,
+        .student-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .student-table th {
+            background-color: #f9fafb;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        /* Scoped Styling for Student Form Container */
+        .student-form-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .student-form-box .input-control {
+            width: 100% !important;
+            box-sizing: border-box;
+            margin-bottom: 0 !important;
+            /* Removes overlapping forced margins */
+        }
+
+        /* Scoped Styling for Student List Rows */
+        .student-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .student-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        .student-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .student-name-text {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 1.05rem;
+        }
+
+        .student-meta-text {
+            font-size: 0.85rem;
+            color: #4b5563;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .student-meta-text strong {
+            color: #374151;
+        }
+
+        /* Redesigned Explicit Submit Button */
+        .btn-student-remove {
+            background-color: transparent;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-student-remove:hover {
+            background-color: #dc2626;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+
+        .btn-student-remove:disabled {
+            color: #9ca3af;
+            border-color: #e5e7eb;
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -280,7 +404,8 @@
                                 elseif (method_exists($reverter, 'reversedString')) $output = $reverter->reversedString($task->title);
                                 elseif (method_exists($reverter, 'convert')) $output = $reverter->convert($task->title);
                                 else $output = strrev($task->title);
-                                } else {
+                                }
+                                else {
                                 $output = strrev($task->title);
                                 }
                                 @endphp
@@ -366,6 +491,85 @@
         </table>
         @else
         <div style="text-align:center; color:#6b7280; padding:10px 0;">No active users found on MockAPI endpoints.</div>
+        @endif
+    </div>
+
+    <div class="container">
+        <div class="section-title">
+            <span>Global Public Posts (cURL GET)</span>
+            <span class="section-badge" style="background-color: #e2e8f0; color: #475569;">JSONPlaceholder API</span>
+        </div>
+
+        @if(!empty($publicPosts) && count($publicPosts) > 0)
+        <table class="posts-table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($publicPosts as $posts)
+                <tr>
+                    <td>{{ $posts['id'] ?? $posts['id_no'] ?? 'No id' }}</td>
+                    <td>{{ $posts['title'] ?? $posts['ftitle'] ?? 'untitled' }}</td>
+                    <td>{{ $posts['body'] ?? $posts['content'] ?? 'No body content' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @else
+        <div style="text-align:center; color:#6b7280; padding:10px 0;">No active public posts found on JSONPlaceholder endpoints.</div>
+        @endif
+    </div>
+
+    <div class="container">
+        <div class="section-title" style="margin-top:0;">Create New Student Info (cURL POST)</div>
+        <form action="{{ route('students.store') }}" method="POST">
+            @csrf
+            <div class="student-form-box">
+                <input type="text" name="name" class="input-control" placeholder="Student Full Name" required autocomplete="off">
+                <input type="text" name="address" class="input-control" placeholder="Current Address" required autocomplete="off">
+                <input type="text" name="college" class="input-control" placeholder="College Name" required autocomplete="off">
+                <input type="text" name="level" class="input-control" placeholder="Qualification Level" required autocomplete="off">
+                <button type="submit" class="btn-add" style="width:100%;">Post to MockAPI Students</button>
+            </div>
+        </form>
+
+        <div class="section-title" style="margin-top: 25px;">
+            <span>MockAPI Students (cURL GET)</span>
+            <span class="section-badge badge-external">External API</span>
+        </div>
+
+        @if(!empty($externalStudents) && count($externalStudents) > 0)
+        <div class="student-grid">
+            @foreach($externalStudents as $student)
+            <div class="student-card">
+                <div class="student-details">
+                    <div class="student-name-text">{{ $student['name'] ?? 'Unnamed Profile' }}</div>
+                    <div class="student-meta-text">
+                        <span><strong>Address:</strong> {{ $student['address'] ?? 'No address mentioned' }}</span>
+                        <span><strong>College:</strong> {{ $student['college'] ?? 'No college mentioned' }}</span>
+                        <span><strong>Level:</strong> {{ $student['level'] ?? 'No level mentioned' }}</span>
+                    </div>
+                </div>
+                <div>
+                    @if(isset($student['id']) && $student['id'] !== '0')
+                    <form action="{{ route('wipeStudent', $student['id']) }}" method="POST" onsubmit="return confirm('Are you sure?');" style="margin:0;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-student-remove">Remove</button>
+                    </form>
+                    @else
+                    <button type="button" class="btn-student-remove" disabled>Unavailable</button>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <div style="text-align:center; color:#6b7280; padding:10px 0;">No active students found on MockAPI endpoints.</div>
         @endif
     </div>
 

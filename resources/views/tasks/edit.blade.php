@@ -1,7 +1,7 @@
 @php
 // Securely reverse the string back so the user can edit human text
 $reverter = new \Rupes\JetConverter\JetConverter();
-$readableTitle = $reverter->convert($task->title);
+$readableTitle =($task->title);
 @endphp
 
 <!DOCTYPE html>
