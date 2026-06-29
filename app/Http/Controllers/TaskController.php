@@ -36,11 +36,11 @@ class TaskController extends Controller
         $publicPosts = [];
 
         if (is_array($jsonResponse) && !isset($jsonResponse['error'])) {
-            $publicPosts = array_slice($jsonResponse, 0, 5); // Slice to grab just the first 5 posts
+            $publicPosts = array_slice($jsonResponse, 0, 10); // Slice to grab just the first 5 posts
         }
 
         // 3. Fetch Student information streams from MockAPI Students
-        $secondapiResponse = MockApiCurl::get('mock_api', '/Students');
+        $secondapiResponse = MockApiCurl::get('mock_api_2', '/Students');
         $externalStudents = [];
 
         if (is_array($secondapiResponse) && !isset($secondapiResponse['error'])) {
