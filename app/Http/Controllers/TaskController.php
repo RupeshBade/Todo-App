@@ -67,7 +67,7 @@ class TaskController extends Controller
 
         $combinedPayload = [
             'tasks'             => $taskPayload,
-            'starlink_contacts' => $externalContacts
+            'mockapi_users' => $externalContacts
         ];
 
         try {
@@ -151,7 +151,7 @@ class TaskController extends Controller
         $response = MockApiCurl::delete('mock_api', '/users/' . $id);
 
         if (!isset($response['error'])) {
-            return redirect()->back()->with('success', 'User completely wiped from MockAPI!');
+            return redirect()->back()->with('success', 'User completely removed from MockAPI users!');
         }
 
         return redirect()->back()->with('api_error', 'Failed to wipe: ' . ($response['message'] ?? 'Unknown error'));

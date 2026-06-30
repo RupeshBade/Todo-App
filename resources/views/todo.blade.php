@@ -269,11 +269,16 @@
             font-weight: 600;
         }
 
-        /* Scoped Styling for Student Form Container */
+        /* Scoped Styling for Student Form Container - Premium 2x2 Grid Layout */
         .student-form-box {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* Forms a clean two-column split */
+            gap: 16px;
+            background: #f9fafb;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 20px;
             margin-bottom: 25px;
         }
 
@@ -281,7 +286,41 @@
             width: 100% !important;
             box-sizing: border-box;
             margin-bottom: 0 !important;
-            /* Removes overlapping forced margins */
+            border: 1px solid #d1d5db;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        /* Subtle focus style highlight for inputs */
+        .student-form-box .input-control:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Spans the submit button beautifully across both columns */
+        .student-form-box .btn-add {
+            grid-column: span 2;
+            margin-top: 4px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .student-form-box .btn-add:hover {
+            background-color: #4338ca;
+        }
+
+        .student-form-box .btn-add:active {
+            transform: scale(0.99);
+        }
+
+        /* Fallback for smaller screens / mobile compatibility */
+        @media (max-width: 550px) {
+            .student-form-box {
+                grid-template-columns: 1fr;
+            }
+
+            .student-form-box .btn-add {
+                grid-column: span 1;
+            }
         }
 
         /* Scoped Styling for Student List Rows */
@@ -417,7 +456,7 @@
 
                 <div class="task-actions">
                     <a href="{{ route('tasks.edit', $task->id) }}" class="link-edit">Edit</a>
-                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" style="display:inline;">
+                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Are you sure?');" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn-del">Delete</button>

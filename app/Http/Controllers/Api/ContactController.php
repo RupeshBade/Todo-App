@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Facades\MockApiCurl;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Facades\StarlinkCurl;
@@ -14,7 +15,7 @@ class ContactController extends Controller
     public function index()
     {
         // Elegant relative call. Your service layer handles the base domain configuration.
-        $response = StarlinkCurl::get('public/v2/contacts');
+        $response = MockApiCurl::get('public/v2/contacts');
 
         return response()->json([
             'status' => 'success',
@@ -35,7 +36,7 @@ class ContactController extends Controller
             'phoneNumber' => $request->input('phone', '+977 9812345678'),
         ];
 
-        $response = StarlinkCurl::post('public/v2/contacts', $contactPayload);
+        $response = MockApiCurl::post('public/v2/contacts', $contactPayload);
 
         return response()->json([
             'status' => 'success',
@@ -47,14 +48,14 @@ class ContactController extends Controller
     /**
      * 3. DELETE Data: DELETE /public/v2/contacts/{subjectId}
      */
-    public function destroy($subjectId)
+    public function destroy(int $subjectId)
     {
         $endpoint = 'public/v2/contacts/' . $subjectId;
-        $response = StarlinkCurl::delete($endpoint);
+        $response = MockApiCurl::delete($endpoint);
 
         return response()->json([
             'status' => 'success',
-            'action' => "Delete Starlink Contact ID: {$subjectId}",
+            'action' => "Delete MockAPI user ID: {$subjectId}",
             'api_response' => $response
         ]);
     }
