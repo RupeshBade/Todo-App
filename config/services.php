@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // Add this inside the array in config/services.php
+    'mockapi' => [
+        'app_key'    => env('MOCKAPI_APP_KEY'),
+        'key_secret' => env('MOCKAPI_KEY_SECRET'),
+    ],
+
 ];

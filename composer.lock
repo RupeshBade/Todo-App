@@ -584,12 +584,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/RupeshBade/cURL_Facade-Package.git",
-                "reference": "ca28043b965ff588c07d8613d964d7110c22d8cc"
+                "reference": "98c6a8d891d0b646d19e7952efaf2bb391565c6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RupeshBade/cURL_Facade-Package/zipball/ca28043b965ff588c07d8613d964d7110c22d8cc",
-                "reference": "ca28043b965ff588c07d8613d964d7110c22d8cc",
+                "url": "https://api.github.com/repos/RupeshBade/cURL_Facade-Package/zipball/98c6a8d891d0b646d19e7952efaf2bb391565c6d",
+                "reference": "98c6a8d891d0b646d19e7952efaf2bb391565c6d",
                 "shasum": ""
             },
             "require": {
@@ -618,7 +618,7 @@
                 "source": "https://github.com/RupeshBade/cURL_Facade-Package/tree/main",
                 "issues": "https://github.com/RupeshBade/cURL_Facade-Package/issues"
             },
-            "time": "2026-06-26T06:10:59+00:00"
+            "time": "2026-07-07T10:15:26+00:00"
         },
         {
             "name": "graham-campbell/result-type",
